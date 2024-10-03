@@ -25,12 +25,12 @@ class Place {
   // Factory constructor to create a Place object from JSON
   factory Place.fromJson(Map<String, dynamic> json) {
     return Place(
-      id: json['id'],
+      id: int.parse(json['id'].toString()), // Ensure the id is parsed as an int
       name: json['name'],
       location: json['location'],
       description: json['description'],
       rating: json['rating'].toDouble(),
-      reviews: json['reviews'],
+      reviews: int.parse(json['reviews'].toString()), // Ensure reviews is parsed as an int
       image: json['image'],
       date: json['date'],
     );

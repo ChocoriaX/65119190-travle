@@ -69,6 +69,13 @@
       "email": "1@gmail.con",
       "password": "1212121212",
       "profile_image": "assets/images/default_profile.jpg"
+    },
+    {
+      "id": "55f2",
+      "name": "ploy",
+      "email": "ploy@gmail.com",
+      "password": "gktp[og",
+      "profile_image": "assets/images/default_profile.jpg"
     }
   ]
 }
