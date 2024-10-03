@@ -62,6 +62,13 @@
       "email": "9@gmail.com",
       "password": "999999",
       "profile_image": "assets/images/default_profile.jpg"
+    },
+    {
+      "id": "ee0a",
+      "name": "2",
+      "email": "1@gmail.con",
+      "password": "1212121212",
+      "profile_image": "assets/images/default_profile.jpg"
     }
   ]
 }
