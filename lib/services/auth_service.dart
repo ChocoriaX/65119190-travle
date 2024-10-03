@@ -6,7 +6,7 @@ class AuthService {
 
   // Function to load user data from HTTP API
   Future<void> loadUserData() async {
-    final url = Uri.parse('http://192.168.1.5:3001/users'); // API URL
+    final url = Uri.parse('http://172.20.10.12:3000/users'); // API URL
 
     try {
       final response = await http.get(url);

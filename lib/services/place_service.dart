@@ -40,7 +40,7 @@ class Place {
 class PlaceService {
   // Load data from HTTP API and parse it
   Future<List<Place>> loadPlaces() async {
-    final url = Uri.parse('http://192.168.1.5:3000/places');
+    final url = Uri.parse('http://172.20.10.12:3001/places');
 
     try {
       final response = await http.get(url);

@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 
 class AuthService {
   // URL ของ API ที่ใช้สำหรับการลงทะเบียน
-  final String apiUrl = 'http://192.168.1.5:3001/users';
+  final String apiUrl = 'http://172.20.10.12:3000/users';
   List<dynamic> users = []; // List to store users
 
   // ฟังก์ชันสำหรับการลงทะเบียนผู้ใช้ใหม่
