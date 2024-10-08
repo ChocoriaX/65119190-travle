@@ -6,7 +6,7 @@ class PlaceDetailPage extends StatelessWidget {
   final Place place;
   final String userName; // รับ userName เพื่อเชื่อมโยงข้อมูลผู้ใช้
 
-  PlaceDetailPage({required this.place, required this.userName, required String userId});
+  PlaceDetailPage({required this.place, required this.userName});
 
   @override
   Widget build(BuildContext context) {

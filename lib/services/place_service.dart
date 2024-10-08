@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'package:http/http.dart' as http;
+import 'package:flutter/services.dart' show rootBundle;
 
 class Place {
   final int id;
@@ -25,12 +25,12 @@ class Place {
   // Factory constructor to create a Place object from JSON
   factory Place.fromJson(Map<String, dynamic> json) {
     return Place(
-      id: int.parse(json['id'].toString()), // Ensure the id is parsed as an int
+      id: json['id'],
       name: json['name'],
       location: json['location'],
       description: json['description'],
       rating: json['rating'].toDouble(),
-      reviews: int.parse(json['reviews'].toString()), // Ensure reviews is parsed as an int
+      reviews: json['reviews'],
       image: json['image'],
       date: json['date'],
     );
@@ -38,25 +38,13 @@ class Place {
 }
 
 class PlaceService {
-  // Load data from HTTP API and parse it
+  // Load JSON from assets and parse it
   Future<List<Place>> loadPlaces() async {
-    final url = Uri.parse('http://172.20.10.12:3001/places');
+    final String jsonString = await rootBundle.loadString('assets/places.json');
+    final Map<String, dynamic> jsonData = json.decode(jsonString); // แปลงเป็น Map เพื่อเข้าถึงคีย์ 'places'
+    final List<dynamic> placesData = jsonData['places']; // เข้าถึงรายการของสถานที่ภายใต้คีย์ 'places'
 
-    try {
-      final response = await http.get(url);
-
-      if (response.statusCode == 200) {
-        // ใช้ utf8.decode เพื่อแปลงข้อมูลที่ได้รับให้เป็น UTF-8
-        String jsonString = utf8.decode(response.bodyBytes);
-        List<dynamic> jsonData = jsonDecode(jsonString);
-
-        return jsonData.map((item) => Place.fromJson(item)).toList();
-      } else {
-        throw Exception('Failed to load places');
-      }
-    } catch (e) {
-      print('Error loading places: $e');
-      return [];
-    }
+    // แปลงแต่ละรายการของ 'places' เป็น Place object
+    return placesData.map((item) => Place.fromJson(item)).toList();
   }
 }

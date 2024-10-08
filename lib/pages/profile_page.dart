@@ -1,19 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 
 class ProfilePage extends StatefulWidget {
   final String userName;
   final String email;
-  final String profileImage;
-  final String userId; // To be used for updating
+  final String profileImage; // เพิ่มฟิลด์สำหรับรูปภาพ
 
-  ProfilePage({
-    required this.userName,
-    required this.email,
-    required this.profileImage,
-    required this.userId, // userId is received from login
-  });
+  ProfilePage({required this.userName, required this.email, required this.profileImage}); // รับค่า userName, email, และรูปภาพจากผู้ที่ล็อกอิน
 
   @override
   _ProfilePageState createState() => _ProfilePageState();
@@ -21,57 +13,14 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   late TextEditingController _nameController;
-  bool _isLoading = false;
 
   @override
   void initState() {
     super.initState();
-    _nameController = TextEditingController(text: widget.userName);
+    _nameController = TextEditingController(text: widget.userName); // เริ่มต้นด้วยชื่อผู้ที่ล็อกอิน
   }
 
-  // Function to update name through API
-  Future<void> _updateName(String newName) async {
-    setState(() {
-      _isLoading = true;
-    });
-
-    // Log the userId to ensure it's correct
-    print('User ID: ${widget.userId}');
-
-    final url = 'http://192.168.1.5:3001/users/${widget.userId}'; // Example API URL
-    try {
-      final response = await http.patch(
-        Uri.parse(url),
-        headers: {'Content-Type': 'application/json; charset=UTF-8'},
-        body: jsonEncode({'name': newName}),
-      );
-
-      if (response.statusCode == 200) {
-        // Successfully updated the name
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('ชื่อผู้ใช้ถูกอัปเดตเรียบร้อยแล้ว')),
-        );
-      } else {
-        print('Failed with status code: ${response.statusCode}');
-        print('Response body: ${response.body}');
-        
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('เกิดข้อผิดพลาดในการอัปเดตข้อมูล: ${response.statusCode}')),
-        );
-      }
-    } catch (e) {
-      print('Error updating name: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('เกิดข้อผิดพลาดในการเชื่อมต่อกับเซิร์ฟเวอร์')),
-      );
-    } finally {
-      setState(() {
-        _isLoading = false;
-      });
-    }
-  }
-
-  // Function to show dialog for editing the name
+  // ฟังก์ชันสำหรับการแสดงฟอร์มแก้ไขชื่อ
   void _editName() {
     showDialog(
       context: context,
@@ -92,18 +41,16 @@ class _ProfilePageState extends State<ProfilePage> {
           actions: [
             TextButton(
               onPressed: () {
-                Navigator.pop(context);
+                Navigator.pop(context); // ปิด Popup
               },
               child: Text('ยกเลิก'),
             ),
             TextButton(
               onPressed: () {
-                // Call the update function to update the name
-                _updateName(_editController.text);
                 setState(() {
-                  _nameController.text = _editController.text;
+                  _nameController.text = _editController.text; // แก้ไขชื่อใน TextField
                 });
-                Navigator.pop(context);
+                Navigator.pop(context); // ปิด Popup
               },
               child: Text('บันทึก'),
             ),
@@ -113,7 +60,7 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  // Function for logging out
+  // ฟังก์ชันสำหรับการ logout
   void _logout() {
     showDialog(
       context: context,
@@ -124,14 +71,13 @@ class _ProfilePageState extends State<ProfilePage> {
           actions: [
             TextButton(
               onPressed: () {
-                Navigator.pop(context);
+                Navigator.pop(context); // ปิด Popup โดยไม่ทำการ Logout
               },
               child: Text('ยกเลิก'),
             ),
             TextButton(
               onPressed: () {
-                Navigator.of(context)
-                    .pushNamedAndRemoveUntil('/login', (route) => false);
+                Navigator.of(context).pushNamedAndRemoveUntil('/login', (route) => false); // ทำการ Logout และนำผู้ใช้กลับไปที่หน้า Login
               },
               child: Text('ออกจากระบบ'),
             ),
@@ -144,7 +90,11 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+      //   // title: Text('Profile'),
+      //   // backgroundColor: Colors.purple,
+      //   // elevation: 0,
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -153,12 +103,12 @@ class _ProfilePageState extends State<ProfilePage> {
             Center(
               child: CircleAvatar(
                 radius: 50,
-                backgroundImage: AssetImage(widget.profileImage),
+                backgroundImage: AssetImage(widget.profileImage), // ใช้รูปจากพาธที่ได้รับ
               ),
             ),
             SizedBox(height: 20),
 
-            // Display Name Field with Edit Button
+            // Display Name Field พร้อมปุ่มแก้ไข
             Row(
               children: [
                 Expanded(
@@ -170,18 +120,18 @@ class _ProfilePageState extends State<ProfilePage> {
                         borderRadius: BorderRadius.circular(10),
                       ),
                     ),
-                    readOnly: true, // Not editable directly
+                    readOnly: true, // ไม่สามารถแก้ไขได้โดยตรง
                   ),
                 ),
                 IconButton(
                   icon: Icon(Icons.edit),
-                  onPressed: _isLoading ? null : _editName, // Call the edit function
+                  onPressed: _editName, // เรียกฟังก์ชันเพื่อเปิด Popup แก้ไขชื่อ
                 ),
               ],
             ),
             SizedBox(height: 15),
 
-            // Email Field (Non-editable)
+            // Email Field (ไม่สามารถแก้ไขได้)
             TextField(
               decoration: InputDecoration(
                 labelText: 'อีเมล',
@@ -189,16 +139,16 @@ class _ProfilePageState extends State<ProfilePage> {
                   borderRadius: BorderRadius.circular(10),
                 ),
               ),
-              controller: TextEditingController(text: widget.email),
-              readOnly: true,
+              controller: TextEditingController(text: widget.email), // อีเมลของผู้ใช้
+              readOnly: true, // ไม่ให้แก้ไขอีเมล
             ),
             SizedBox(height: 20),
 
-            Spacer(),
+            Spacer(), // ดันปุ่ม Logout ไปด้านล่าง
 
             // Logout Button
             ElevatedButton(
-              onPressed: _logout,
+              onPressed: _logout, // ฟังก์ชัน logout ที่มีการถามยืนยัน
               child: Text('ออกจากระบบ', style: TextStyle(color: Colors.white)),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.red,

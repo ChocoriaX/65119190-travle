@@ -61,7 +61,6 @@ class _LoginPageState extends State<LoginPage> {
           context,
           MaterialPageRoute(
             builder: (context) => HomePage(
-              userId: '',
               userName: userName,  // ส่งชื่อผู้ใช้ไปที่ HomePage
               email: email,        // ส่งอีเมลไปที่ HomePage
               profileImage: profileImage, // ส่งพาธรูปโปรไฟล์ไปที่ HomePage

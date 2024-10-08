@@ -1,26 +1,14 @@
 import 'dart:convert';
-import 'package:http/http.dart' as http;
+import 'package:flutter/services.dart' show rootBundle;
 
 class AuthService {
   List<dynamic> users = [];
 
-  // Function to load user data from HTTP API
+  // Function to load user data from JSON file
   Future<void> loadUserData() async {
-    final url = Uri.parse('http://172.20.10.12:3000/users'); // API URL
-
-    try {
-      final response = await http.get(url);
-
-      if (response.statusCode == 200) {
-        // Decode the JSON response into a list of users
-        users = jsonDecode(response.body); // Get user data from API
-        print('User data loaded: ${users.length} users');
-      } else {
-        throw Exception('Failed to load user data');
-      }
-    } catch (e) {
-      print('Error loading user data: $e');
-    }
+    String jsonString = await rootBundle.loadString('assets/data.json');
+    Map<String, dynamic> jsonData = jsonDecode(jsonString); // แปลง JSON เป็น Map
+    users = jsonData['users']; // เข้าถึงข้อมูลผู้ใช้ภายใต้คีย์ 'users'
   }
 
   // Function to check login credentials
@@ -53,14 +41,5 @@ class AuthService {
       orElse: () => null,
     );
     return user != null ? user['profile_image'] as String? : null;
-  }
-
-  // Function to reset and reload API data
-  Future<void> resetAPI() async {
-    // Clear the existing users list
-    users.clear();
-    print('User data reset. Reloading from API...');
-    // Reload the user data from the API
-    await loadUserData();
   }
 }

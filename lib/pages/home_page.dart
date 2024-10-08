@@ -6,18 +6,11 @@ import 'profile_page.dart'; // Import ProfilePage
 import 'bookmarks_page.dart'; // Import BookmarksPage
 
 class HomePage extends StatefulWidget {
-  final String userName;
-  final String email;
-  final String profileImage;
-  final String userId;
+  final String userName;  // ชื่อผู้ใช้ที่ล็อกอิน
+  final String email;     // อีเมลของผู้ใช้
+  final String profileImage; // พาธรูปโปรไฟล์ผู้ใช้
 
-  const HomePage({
-    required this.userName,
-    required this.email,
-    required this.profileImage,
-    required this.userId,
-    Key? key,
-  }) : super(key: key);
+  HomePage({required this.userName, required this.email, required this.profileImage});
 
   @override
   _HomePageState createState() => _HomePageState();
@@ -26,42 +19,35 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0; // To track the current tab
   late Future<List<Place>> futurePlaces;
-  String _searchText = ''; // Variable to store search query
+  String _searchText = ''; // ตัวแปรสำหรับเก็บค่าการค้นหา
 
   @override
   void initState() {
     super.initState();
-    futurePlaces = PlaceService().loadPlaces(); // Load places from API or JSON
+    futurePlaces = PlaceService().loadPlaces(); // Load places from JSON
   }
 
   // Navigation tabs content
   List<Widget> _widgetOptions() {
     return [
       HomePageContent(
-        futurePlaces: futurePlaces,
-        searchText: _searchText,
-        onSearchChanged: _onSearchChanged,
-        userName: widget.userName,
-        userId: widget.userId, // Pass userId to HomePageContent
-      ),
-      BookmarksPage(userName: widget.userName), // Pass userName to BookmarksPage
-      ProfilePage(
-        userName: widget.userName,
-        email: widget.email,
-        profileImage: widget.profileImage,
-        userId: widget.userId, // Pass userId to ProfilePage
-      ),
+        futurePlaces: futurePlaces, 
+        searchText: _searchText, // ส่งค่าการค้นหาไปยัง HomePageContent
+        onSearchChanged: _onSearchChanged, // ส่งฟังก์ชันจัดการการเปลี่ยนแปลงค่าค้นหา
+        userName: widget.userName, // ส่ง userName ไปยัง HomePageContent
+      ), 
+      BookmarksPage(userName: widget.userName),  // เพิ่ม userName เพื่อแสดงบุ๊คมาร์คของผู้ใช้
+      ProfilePage(userName: widget.userName, email: widget.email, profileImage: widget.profileImage),
     ];
   }
 
-  // Handle tab navigation
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
     });
   }
 
-  // Handle search query changes
+  // ฟังก์ชันจัดการการเปลี่ยนแปลงค่าการค้นหา
   void _onSearchChanged(String text) {
     setState(() {
       _searchText = text;
@@ -72,7 +58,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('เที่ยวทั่วไทย', style: TextStyle(color: Colors.white)),
+        title: Text('เที่ยวทั่วไทย',style: TextStyle(color: Colors.white)),
         backgroundColor: Colors.blue,
         elevation: 0,
       ),
@@ -103,25 +89,22 @@ class HomePageContent extends StatefulWidget {
   final Future<List<Place>> futurePlaces;
   final String searchText;
   final Function(String) onSearchChanged;
-  final String userName;
-  final String userId;
+  final String userName; // เพิ่ม userName เพื่อใช้ในการกรองข้อมูล
 
-  const HomePageContent({
-    Key? key,
-    required this.futurePlaces,
-    required this.searchText,
-    required this.onSearchChanged,
+  HomePageContent({
+    required this.futurePlaces, 
+    required this.searchText, 
+    required this.onSearchChanged, 
     required this.userName,
-    required this.userId,
-  }) : super(key: key);
+  });
 
   @override
   _HomePageContentState createState() => _HomePageContentState();
 }
 
 class _HomePageContentState extends State<HomePageContent> {
-  String? selectedProvince;
-  String searchQuery = '';
+  String? selectedProvince; // ตัวแปรเก็บค่าจังหวัดที่เลือก
+  String searchQuery = ''; // ตัวแปรเก็บค่าการค้นหา
 
   @override
   Widget build(BuildContext context) {
@@ -134,13 +117,13 @@ class _HomePageContentState extends State<HomePageContent> {
           TextField(
             onChanged: (value) {
               setState(() {
-                searchQuery = value;
+                searchQuery = value; // อัปเดตค่าค้นหาเมื่อผู้ใช้กรอกข้อมูล
               });
-              widget.onSearchChanged(value);
+              widget.onSearchChanged(value); // เรียกฟังก์ชัน onSearchChanged ที่ได้รับจากพาเรนต์
             },
             decoration: InputDecoration(
               labelText: 'ค้นหาสถานที่หรือจังหวัด...',
-              prefixIcon: const Icon(Icons.search),
+              prefixIcon: Icon(Icons.search),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(30),
               ),
@@ -153,18 +136,19 @@ class _HomePageContentState extends State<HomePageContent> {
             future: widget.futurePlaces,
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(child: CircularProgressIndicator());
+                return Center(child: CircularProgressIndicator());
               } else if (snapshot.hasError) {
-                return const Center(child: Text('Error loading places'));
+                return Center(child: Text('Error loading places'));
               } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                return const Center(child: Text('No places available'));
+                return Center(child: Text('No places available'));
               } else {
                 final places = snapshot.data!;
+                // สร้างรายชื่อจังหวัดที่ไม่มีค่าซ้ำ และเพิ่มตัวเลือก 'ทั้งหมด'
                 List<String> provinces = ['ทั้งหมด'] + places.map((place) => place.location).toSet().toList();
-
+                
                 return DropdownButton<String>(
                   value: selectedProvince,
-                  hint: const Text('เลือกจังหวัด'),
+                  hint: Text('เลือกจังหวัด'),
                   onChanged: (String? newValue) {
                     setState(() {
                       selectedProvince = newValue;
@@ -182,6 +166,7 @@ class _HomePageContentState extends State<HomePageContent> {
           ),
           const SizedBox(height: 20),
 
+          // Popular Section Title
           const Text(
             'ยอดนิยม',
             style: TextStyle(
@@ -191,33 +176,37 @@ class _HomePageContentState extends State<HomePageContent> {
           ),
           const SizedBox(height: 10),
 
+          // Popular Destinations List (ListView)
           Expanded(
             child: FutureBuilder<List<Place>>(
-              future: widget.futurePlaces,
+              future: widget.futurePlaces, // Fetch places from JSON
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
+                  return Center(child: CircularProgressIndicator());
                 } else if (snapshot.hasError) {
-                  return const Center(child: Text('Error loading places'));
+                  return Center(child: Text('Error loading places'));
                 } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return const Center(child: Text('No places available'));
+                  return Center(child: Text('No places available'));
                 } else {
                   final places = snapshot.data!;
 
                   // ดึง Bookmark ของผู้ใช้
                   final bookmarks = BookmarkService().getBookmarks(widget.userName);
 
+                  // กรองข้อมูลตามค่าการค้นหาและจังหวัดที่เลือก
                   final filteredPlaces = places.where((place) {
                     final searchLower = searchQuery.toLowerCase();
                     final matchesSearch = place.name.toLowerCase().contains(searchLower) ||
                         place.location.toLowerCase().contains(searchLower);
+
+                    // กรองตามจังหวัดที่เลือก ('ทั้งหมด' จะหมายถึงไม่กรอง)
                     final matchesProvince = selectedProvince == null || selectedProvince == 'ทั้งหมด' || place.location == selectedProvince;
 
-                    return matchesSearch && matchesProvince && !bookmarks.contains(place);
+                    return matchesSearch && matchesProvince && !bookmarks.contains(place); // ไม่แสดงสถานที่ที่ถูก Bookmark แล้ว
                   }).toList();
 
                   if (filteredPlaces.isEmpty) {
-                    return const Center(child: Text('No places match your search'));
+                    return Center(child: Text('No places match your search'));
                   }
 
                   return ListView.builder(
@@ -236,20 +225,19 @@ class _HomePageContentState extends State<HomePageContent> {
     );
   }
 
+  // Build each place card with full-width banner image
   Widget _buildPlaceCard(BuildContext context, Place place) {
     return GestureDetector(
       onTap: () {
+        // Navigate to detailed view when the card is tapped
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => PlaceDetailPage(
-              place: place,
-              userName: widget.userName,
-              userId: widget.userId,
-            ),
+            builder: (context) => PlaceDetailPage(place: place, userName: widget.userName), // Pass userName to PlaceDetailPage
           ),
         );
       },
+      
       child: Card(
         margin: const EdgeInsets.symmetric(vertical: 10),
         shape: RoundedRectangleBorder(
@@ -258,9 +246,10 @@ class _HomePageContentState extends State<HomePageContent> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Full-width banner image
             Container(
-              height: 200,
-              width: double.infinity,
+              height: 200, // Set a fixed height for the banner
+              width: double.infinity, // Make the image take the full width of the card
               decoration: BoxDecoration(
                 borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(10),
@@ -268,7 +257,7 @@ class _HomePageContentState extends State<HomePageContent> {
                 ),
                 image: DecorationImage(
                   image: AssetImage(place.image),
-                  fit: BoxFit.cover,
+                  fit: BoxFit.cover, // Ensure the image covers the entire container
                 ),
               ),
             ),
@@ -277,6 +266,7 @@ class _HomePageContentState extends State<HomePageContent> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
+                  // Place name and location
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -293,6 +283,7 @@ class _HomePageContentState extends State<HomePageContent> {
                       ),
                     ],
                   ),
+                  // Rating
                   Row(
                     children: [
                       const Icon(Icons.star, color: Colors.yellow, size: 16),

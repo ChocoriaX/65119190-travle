@@ -1,81 +1,17 @@
 {
   "users": [
     {
-      "id": "1",
+      "id": 1,
       "name": "Aphichet Krodsuea",
       "email": "Aphichet.kr@mail.wu.ac.th",
       "password": "1q2w3e4r",
       "profile_image": "assets/images/john_doe.jpg"
-    },
-    {
-      "id": "2",
+    },{
+      "id": 2,
       "name": "Jane Smith",
       "email": "jane@example.com",
       "password": "123456c",
       "profile_image": "assets/images/jane_smith.jpg"
-    },
-    {
-      "id": "c684",
-      "name": "111",
-      "email": "1111@gmail.com",
-      "password": "111111",
-      "profile_image": "12121212"
-    },
-    {
-      "id": "5b42",
-      "name": "11111111111",
-      "email": "111111111111111111@gmail.com",
-      "password": "111111",
-      "profile_image": "assets/images/default_profile.jpg"
-    },
-    {
-      "id": "2560",
-      "name": "ๅ/ๅ/ๅ/ๅ/",
-      "email": "12121212@gmail.com",
-      "password": "1212121121",
-      "profile_image": "assets/images/default_profile.jpg"
-    },
-    {
-      "id": "61a1",
-      "name": "11",
-      "email": "1@gmail.com",
-      "password": "111111",
-      "profile_image": "assets/images/default_profile.jpg"
-    },
-    {
-      "id": "8c9b",
-      "name": "aaaa",
-      "email": "a@gmail.com",
-      "password": "aaaaaa",
-      "profile_image": "assets/images/default_profile.jpg"
-    },
-    {
-      "id": "62b1",
-      "name": "12",
-      "email": "123@gmail.com",
-      "password": "1223456",
-      "profile_image": "assets/images/default_profile.jpg"
-    },
-    {
-      "id": "4299",
-      "name": "09",
-      "email": "9@gmail.com",
-      "password": "999999",
-      "profile_image": "assets/images/default_profile.jpg"
-    },
-    {
-      "id": "ee0a",
-      "name": "2",
-      "email": "1@gmail.con",
-      "password": "1212121212",
-      "profile_image": "assets/images/default_profile.jpg"
-    },
-    {
-      "id": "55f2",
-      "name": "ploy",
-      "email": "ploy@gmail.com",
-      "password": "gktp[og",
-      "profile_image": "assets/images/default_profile.jpg"
     }
   ]
 }

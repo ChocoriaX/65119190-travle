@@ -1,5 +1,7 @@
+import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
-import '../services/auth_register.dart';
+import 'package:path_provider/path_provider.dart';
 
 class RegisterPage extends StatefulWidget {
   @override
@@ -11,13 +13,56 @@ class _RegisterPageState extends State<RegisterPage> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _profileImageController = TextEditingController();
   bool _agreeToTerms = false;
   bool _isLoading = false;
 
-  AuthService _authService = AuthService(); // สร้าง instance ของ AuthService
+  // Function to get the local path for storing data
+  Future<String> get _localPath async {
+    final directory = await getApplicationDocumentsDirectory();
+    print('Data directory: ${directory.path}'); // Print the directory path
+    return directory.path;
+  }
 
-  // ฟังก์ชันสำหรับการลงทะเบียนผู้ใช้
+  // Function to get the local file for storing the JSON data
+  Future<File> get _localFile async {
+    final path = await _localPath;
+    return File('$path/data.json'); // Return the file path
+  }
+
+  // Function to read data from the file
+  Future<List<dynamic>> _readData() async {
+    try {
+      final file = await _localFile;
+      if (await file.exists()) {
+        final contents = await file.readAsString();
+        return json.decode(contents);
+      } else {
+        print('File not found, returning empty list'); // Debugging log
+        return [];
+      }
+    } catch (e) {
+      print('Error reading data: $e'); // Debugging log
+      return [];
+    }
+  }
+
+  // Function to write data to the file
+  Future<void> _writeData(Map<String, dynamic> userData) async {
+    try {
+      final file = await _localFile;
+
+      // Read the current data and add the new user
+      List<dynamic> currentData = await _readData();
+      currentData.add(userData);
+
+      await file.writeAsString(json.encode(currentData));
+      print('Data written successfully at ${file.path}'); // Debugging log
+    } catch (e) {
+      print('Error writing data: $e'); // Debugging log
+    }
+  }
+
+  // Function to handle the registration process
   Future<void> _registerUser() async {
     if (!_agreeToTerms) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -32,28 +77,32 @@ class _RegisterPageState extends State<RegisterPage> {
       });
 
       try {
-        // เรียกใช้ฟังก์ชัน register ใน AuthService
-        String result = await _authService.register(
-          _nameController.text,
-          _emailController.text,
-          _passwordController.text,
-          _profileImageController.text.isNotEmpty
-              ? _profileImageController.text
-              : 'assets/images/default_profile.jpg',
+        final String name = _nameController.text;
+        final String email = _emailController.text;
+        final String password = _passwordController.text;
+
+        String userId = DateTime.now().millisecondsSinceEpoch.toString();
+
+        Map<String, dynamic> userData = {
+          'userid': userId,
+          'name': name,
+          'email': email,
+          'password': password,
+        };
+
+        await _writeData(userData);
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Registration successful!')),
         );
 
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(result)));
-
-        // หากลงทะเบียนสำเร็จ จะนำผู้ใช้กลับไปที่หน้าล็อกอิน
-        if (result == 'Registration successful!') {
-          Navigator.pop(context);
-        }
-
-        // เคลียร์ข้อมูลที่กรอกในฟอร์ม
+        // Clear fields
         _nameController.clear();
         _emailController.clear();
         _passwordController.clear();
-        _profileImageController.clear();
+
+        // Navigate back to the login screen
+        Navigator.pop(context);
       } catch (e) {
         print('Error during registration: $e');
         ScaffoldMessenger.of(context).showSnackBar(
@@ -70,6 +119,9 @@ class _RegisterPageState extends State<RegisterPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // appBar: AppBar(
+      //   title: Text('Sign Up'),
+      // ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20.0),
         child: Center(
@@ -87,7 +139,6 @@ class _RegisterPageState extends State<RegisterPage> {
                   ),
                 ),
                 SizedBox(height: 10),
-
                 // Subtitle
                 Text(
                   'Please fill in your details to sign up with us!',
@@ -129,8 +180,8 @@ class _RegisterPageState extends State<RegisterPage> {
                           ),
                         ),
                         validator: (value) {
-                          if (value == null || value.isEmpty || !value.contains('@')) {
-                            return 'Please enter a valid email';
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter your email or phone number';
                           }
                           return null;
                         },
@@ -154,18 +205,6 @@ class _RegisterPageState extends State<RegisterPage> {
                           }
                           return null;
                         },
-                      ),
-                      SizedBox(height: 15),
-
-                      // Profile Image URL (Optional)
-                      TextFormField(
-                        controller: _profileImageController,
-                        decoration: InputDecoration(
-                          labelText: 'Profile Image URL (Optional)',
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
                       ),
                     ],
                   ),
